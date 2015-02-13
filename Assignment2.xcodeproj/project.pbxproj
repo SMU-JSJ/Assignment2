@@ -9,11 +9,17 @@
 /* Begin PBXBuildFile section */
 		EFB3CEDB1A8D919D00F91DB5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CEDA1A8D919D00F91DB5 /* main.m */; };
 		EFB3CEDE1A8D919D00F91DB5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CEDD1A8D919D00F91DB5 /* AppDelegate.m */; };
-		EFB3CEE11A8D919D00F91DB5 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CEE01A8D919D00F91DB5 /* ViewController.m */; };
+		EFB3CEE11A8D919D00F91DB5 /* ModuleAViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CEE01A8D919D00F91DB5 /* ModuleAViewController.mm */; };
 		EFB3CEE41A8D919D00F91DB5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EFB3CEE21A8D919D00F91DB5 /* Main.storyboard */; };
 		EFB3CEE61A8D919D00F91DB5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EFB3CEE51A8D919D00F91DB5 /* Images.xcassets */; };
 		EFB3CEE91A8D919D00F91DB5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = EFB3CEE71A8D919D00F91DB5 /* LaunchScreen.xib */; };
 		EFB3CEF51A8D919D00F91DB5 /* Assignment2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CEF41A8D919D00F91DB5 /* Assignment2Tests.m */; };
+		EFB3CF061A8D91B900F91DB5 /* AudioFileReader.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CEFF1A8D91B900F91DB5 /* AudioFileReader.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		EFB3CF071A8D91B900F91DB5 /* AudioFileWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CF011A8D91B900F91DB5 /* AudioFileWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		EFB3CF081A8D91B900F91DB5 /* Novocaine.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CF031A8D91B900F91DB5 /* Novocaine.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		EFB3CF091A8D91B900F91DB5 /* RingBuffer.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CF051A8D91B900F91DB5 /* RingBuffer.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		EFB3CF0E1A8D93B200F91DB5 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB3CF0D1A8D93B200F91DB5 /* GLKit.framework */; };
+		EFB3CF111A8D945000F91DB5 /* ModuleBViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = EFB3CF101A8D945000F91DB5 /* ModuleBViewController.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,14 +38,27 @@
 		EFB3CEDA1A8D919D00F91DB5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EFB3CEDC1A8D919D00F91DB5 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		EFB3CEDD1A8D919D00F91DB5 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		EFB3CEDF1A8D919D00F91DB5 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		EFB3CEE01A8D919D00F91DB5 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		EFB3CEDF1A8D919D00F91DB5 /* ModuleAViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModuleAViewController.h; sourceTree = "<group>"; };
+		EFB3CEE01A8D919D00F91DB5 /* ModuleAViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ModuleAViewController.mm; sourceTree = "<group>"; };
 		EFB3CEE31A8D919D00F91DB5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		EFB3CEE51A8D919D00F91DB5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		EFB3CEE81A8D919D00F91DB5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		EFB3CEEE1A8D919D00F91DB5 /* Assignment2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Assignment2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EFB3CEF31A8D919D00F91DB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EFB3CEF41A8D919D00F91DB5 /* Assignment2Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Assignment2Tests.m; sourceTree = "<group>"; };
+		EFB3CEFE1A8D91B900F91DB5 /* AudioFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioFileReader.h; sourceTree = "<group>"; };
+		EFB3CEFF1A8D91B900F91DB5 /* AudioFileReader.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioFileReader.mm; sourceTree = "<group>"; };
+		EFB3CF001A8D91B900F91DB5 /* AudioFileWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioFileWriter.h; sourceTree = "<group>"; };
+		EFB3CF011A8D91B900F91DB5 /* AudioFileWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioFileWriter.m; sourceTree = "<group>"; };
+		EFB3CF021A8D91B900F91DB5 /* Novocaine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Novocaine.h; sourceTree = "<group>"; };
+		EFB3CF031A8D91B900F91DB5 /* Novocaine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Novocaine.m; sourceTree = "<group>"; };
+		EFB3CF041A8D91B900F91DB5 /* RingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RingBuffer.h; sourceTree = "<group>"; };
+		EFB3CF051A8D91B900F91DB5 /* RingBuffer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RingBuffer.mm; sourceTree = "<group>"; };
+		EFB3CF0B1A8D91EE00F91DB5 /* SMUGraphHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMUGraphHelper.h; sourceTree = "<group>"; };
+		EFB3CF0C1A8D91EE00F91DB5 /* SMUFFTHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMUFFTHelper.h; sourceTree = "<group>"; };
+		EFB3CF0D1A8D93B200F91DB5 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		EFB3CF0F1A8D945000F91DB5 /* ModuleBViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModuleBViewController.h; sourceTree = "<group>"; };
+		EFB3CF101A8D945000F91DB5 /* ModuleBViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ModuleBViewController.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFB3CF0E1A8D93B200F91DB5 /* GLKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +83,8 @@
 		EFB3CECC1A8D919D00F91DB5 = {
 			isa = PBXGroup;
 			children = (
+				EFB3CF0D1A8D93B200F91DB5 /* GLKit.framework */,
+				EFB3CF0A1A8D91C500F91DB5 /* Novocaine */,
 				EFB3CED71A8D919D00F91DB5 /* Assignment2 */,
 				EFB3CEF11A8D919D00F91DB5 /* Assignment2Tests */,
 				EFB3CED61A8D919D00F91DB5 /* Products */,
@@ -81,11 +103,15 @@
 		EFB3CED71A8D919D00F91DB5 /* Assignment2 */ = {
 			isa = PBXGroup;
 			children = (
+				EFB3CF0B1A8D91EE00F91DB5 /* SMUGraphHelper.h */,
+				EFB3CF0C1A8D91EE00F91DB5 /* SMUFFTHelper.h */,
 				EFB3CEDC1A8D919D00F91DB5 /* AppDelegate.h */,
 				EFB3CEDD1A8D919D00F91DB5 /* AppDelegate.m */,
-				EFB3CEDF1A8D919D00F91DB5 /* ViewController.h */,
-				EFB3CEE01A8D919D00F91DB5 /* ViewController.m */,
+				EFB3CEDF1A8D919D00F91DB5 /* ModuleAViewController.h */,
+				EFB3CEE01A8D919D00F91DB5 /* ModuleAViewController.mm */,
 				EFB3CEE21A8D919D00F91DB5 /* Main.storyboard */,
+				EFB3CF0F1A8D945000F91DB5 /* ModuleBViewController.h */,
+				EFB3CF101A8D945000F91DB5 /* ModuleBViewController.mm */,
 				EFB3CEE51A8D919D00F91DB5 /* Images.xcassets */,
 				EFB3CEE71A8D919D00F91DB5 /* LaunchScreen.xib */,
 				EFB3CED81A8D919D00F91DB5 /* Supporting Files */,
@@ -117,6 +143,22 @@
 				EFB3CEF31A8D919D00F91DB5 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EFB3CF0A1A8D91C500F91DB5 /* Novocaine */ = {
+			isa = PBXGroup;
+			children = (
+				EFB3CEFE1A8D91B900F91DB5 /* AudioFileReader.h */,
+				EFB3CEFF1A8D91B900F91DB5 /* AudioFileReader.mm */,
+				EFB3CF001A8D91B900F91DB5 /* AudioFileWriter.h */,
+				EFB3CF011A8D91B900F91DB5 /* AudioFileWriter.m */,
+				EFB3CF021A8D91B900F91DB5 /* Novocaine.h */,
+				EFB3CF031A8D91B900F91DB5 /* Novocaine.m */,
+				EFB3CF041A8D91B900F91DB5 /* RingBuffer.h */,
+				EFB3CF051A8D91B900F91DB5 /* RingBuffer.mm */,
+			);
+			name = Novocaine;
+			path = Assignment2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,9 +261,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFB3CEE11A8D919D00F91DB5 /* ViewController.m in Sources */,
+				EFB3CEE11A8D919D00F91DB5 /* ModuleAViewController.mm in Sources */,
+				EFB3CF111A8D945000F91DB5 /* ModuleBViewController.mm in Sources */,
 				EFB3CEDE1A8D919D00F91DB5 /* AppDelegate.m in Sources */,
+				EFB3CF081A8D91B900F91DB5 /* Novocaine.m in Sources */,
+				EFB3CF091A8D91B900F91DB5 /* RingBuffer.mm in Sources */,
+				EFB3CF071A8D91B900F91DB5 /* AudioFileWriter.m in Sources */,
 				EFB3CEDB1A8D919D00F91DB5 /* main.m in Sources */,
+				EFB3CF061A8D91B900F91DB5 /* AudioFileReader.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

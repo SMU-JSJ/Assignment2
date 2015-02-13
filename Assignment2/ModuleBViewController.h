@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  ModuleBViewController.h
 //  Assignment2
 //
 //  Created by ch484-mac7 on 2/12/15.
@@ -7,9 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GLKit/GLKit.h>
 
-@interface ViewController : UIViewController
-
+@interface ModuleBViewController : GLKViewController
 
 @end
-
