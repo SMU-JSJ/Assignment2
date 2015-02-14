@@ -15,6 +15,7 @@
 
 #define kBufferLength 4096
 #define kWindowSize 3
+#define kdf 10.766
 
 @interface ModuleAViewController ()
 
@@ -28,6 +29,12 @@
 
 @property (nonatomic) int peakOneIndex;
 @property (nonatomic) int peakTwoIndex;
+
+@property (nonatomic) float peakOneFreq;
+@property (nonatomic) float peakTwoFreq;
+
+@property (weak, nonatomic) IBOutlet UILabel *peakOneLabel;
+@property (weak, nonatomic) IBOutlet UILabel *peakTwoLabel;
 
 @end
 
@@ -79,7 +86,7 @@ RingBuffer *ringBuffer;
     // Do any additional setup after loading the view, typically from a nib.
     
     ringBuffer = new RingBuffer(kBufferLength,2);
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:2
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:.1
                                                   target:self
                                                 selector:@selector(update)
                                                 userInfo:nil
@@ -144,45 +151,34 @@ RingBuffer *ringBuffer;
     int oldPeakOneIndex = self.peakOneIndex;
     int oldPeakTwoIndex = self.peakTwoIndex;
     
+    float oldPeakOneFreq = self.peakOneFreq;
+    float oldPeakTwoFreq = self.peakTwoFreq;
+    
     self.peakOneIndex = 0;
     self.peakTwoIndex = 0;
+    
+    self.peakOneFreq = 0;
+    self.peakTwoFreq = 0;
     
     for (int i = 0; i < kBufferLength/2 - kWindowSize; i++) {
         int index = [self maxIndex:self.fftMagnitudeBuffer startIndex:i length:kWindowSize];
         // check the index is the midpoint
-        if (index == i + (kWindowSize - 1)/2) {
-            [self compareToPeaksAndSetSmallest:index];
+        if (index == i + (kWindowSize - 1)/2 && self.fftMagnitudeBuffer[index] > 5) {
+            [self compareAndSetPeakValues:index peakOneIndex:self.peakOneIndex peakTwoIndex:self.peakTwoIndex data:self.fftMagnitudeBuffer];
         }
     }
     
-    NSLog(@"%f", self.fftMagnitudeBuffer[self.peakOneIndex]);
-    NSLog(@"%f", self.fftMagnitudeBuffer[self.peakTwoIndex]);
-    // silence is less than like 5
+    self.peakOneFreq = [self getFrequency:self.peakOneIndex data:self.fftMagnitudeBuffer];
+    self.peakTwoFreq = [self getFrequency:self.peakTwoIndex data:self.fftMagnitudeBuffer];
     
-//    if (oldPeakOneIndex * 10.766 + 3 < self.peakOneIndex * 10.766 ||
-//        oldPeakOneIndex * 10.766 - 3 > self.peakOneIndex * 10.766) {
-//        NSLog(@"Peak one: %f", self.peakOneIndex * 10.766);
-//    }
-//    else {
-//        NSLog(@"Peak one not replaced");
-//    }
-//    
-//    if (oldPeakTwoIndex * 10.766 + 3 < self.peakTwoIndex * 10.766 ||
-//        oldPeakTwoIndex * 10.766 - 3 > self.peakTwoIndex * 10.766) {
-//        NSLog(@"Peak two: %f", self.peakTwoIndex * 10.766);
-//    }
-//    else {
-//        NSLog(@"Peak two not replaced");
-//    }
+    [self chooseAndSetPeakIndex:oldPeakOneIndex oldFreq:oldPeakOneFreq newIndex:self.peakOneIndex newFreq:self.peakOneFreq peak:1];
+    [self chooseAndSetPeakIndex:oldPeakTwoIndex oldFreq:oldPeakTwoFreq newIndex:self.peakTwoIndex newFreq:self.peakTwoFreq peak:2];
     
-//    // Take the max value in each chunk
-//    for (int i = 0; i < kBufferLength/2; i++) {
-//        int chunk = i/kChunkSize;
-//        
-//        //        if (self.fftMagnitudeBuffer[i] > self.fftEqBuffer[chunk]) {
-//        //            self.fftEqBuffer[chunk] = self.fftMagnitudeBuffer[i];
-//        //        }
-//    }
+    [self orderPeaks];
+    
+    self.peakOneLabel.text = [NSString stringWithFormat:@"%.0f Hz", self.peakOneFreq];
+    self.peakTwoLabel.text = [NSString stringWithFormat:@"%.0f Hz", self.peakTwoFreq];
+
 }
 
 // Find the maximum index in an array given a starting index and length of subarray
@@ -200,18 +196,65 @@ RingBuffer *ringBuffer;
     return maxIndex;
 }
 
-- (void)compareToPeaksAndSetSmallest:(int)index {
+- (void)compareAndSetPeakValues:(int)index
+         peakOneIndex:(int)peakOneIndex
+         peakTwoIndex:(int)peakTwoIndex
+                 data:(float*)data{
     // see which peak value is smaller
-    if (self.fftMagnitudeBuffer[self.peakOneIndex] > self.fftMagnitudeBuffer[self.peakTwoIndex] &&
-        self.fftMagnitudeBuffer[index] > self.fftMagnitudeBuffer[self.peakTwoIndex]) {
+    if (data[peakOneIndex] > data[peakTwoIndex] &&
+        data[index] > data[peakTwoIndex]) {
         self.peakTwoIndex = index;
     }
-    else if (self.fftMagnitudeBuffer[self.peakTwoIndex] >= self.fftMagnitudeBuffer[self.peakOneIndex] &&
-             self.fftMagnitudeBuffer[index] > self.fftMagnitudeBuffer[self.peakOneIndex]) {
+    else if (data[peakTwoIndex] >= data[peakOneIndex] &&
+             data[index] > data[peakOneIndex]) {
         self.peakOneIndex = index;
     }
-
 }
 
+- (void)orderPeaks {
+    if (self.peakOneIndex < self.peakTwoIndex){
+        int tempIndex = self.peakOneIndex;
+        self.peakOneIndex = self.peakTwoIndex;
+        self.peakTwoIndex = tempIndex;
+        
+        int tempFreq = self.peakOneFreq;
+        self.peakOneFreq = self.peakTwoFreq;
+        self.peakTwoFreq = tempFreq;
+    }
+}
+
+- (float)getFrequency:(int)index
+                 data:(float*)data {
+    if(index == 0)
+        return 0;
+    
+    float f2 = index * kdf;
+    float m1 = data[index - 1];
+    float m2 = data[index];
+    float m3 = data[index + 1];
+    
+    return f2 + ((m3 - m2) / (2.0 * m2 - m1 - m2)) * kdf / 2.0;
+    
+}
+
+- (void)chooseAndSetPeakIndex:(int)oldIndex
+                      oldFreq:(float)oldFreq
+                     newIndex:(int)newIndex
+                      newFreq:(float)newFreq
+                         peak:(int)peak {
+    if ((oldFreq + 3 < newFreq ||
+         oldFreq - 3 > newFreq) &&
+         newIndex != 0) {
+        return;
+    } else {
+        if(peak == 1) {
+            self.peakOneIndex = oldIndex;
+            self.peakOneFreq = oldFreq;
+        } else {
+            self.peakTwoIndex = oldIndex;
+            self.peakTwoFreq = oldFreq;
+        }
+    }
+}
 
 @end
