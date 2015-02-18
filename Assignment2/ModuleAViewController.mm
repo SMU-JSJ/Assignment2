@@ -125,6 +125,29 @@ RingBuffer *ringBuffer;
              ringBuffer->AddNewFloatData(data, numFrames);
      }];
     
+    
+    // TODO: fix this
+    __block float frequency = 0; //starting frequency
+    __block float phase = 0.0;
+    __block float samplingRate = self.audioManager.samplingRate;
+    [self.audioManager setOutputBlock:^(float *data, UInt32 numFrames, UInt32 numChannels)
+     {
+         double phaseIncrement = 2*M_PI*frequency/samplingRate;
+         double repeatMax = 2*M_PI;
+         for (int i=0; i < numFrames; ++i)
+         {
+             for(int j=0;j<numChannels;j++){
+                 data[i*numChannels+j] = 5.0*sin(phase);
+                 
+             }
+             phase += phaseIncrement;
+             
+             if(phase>repeatMax)
+                 phase -= repeatMax;
+         }
+     }];
+
+    
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

@@ -15,6 +15,7 @@
 
 #define kBufferLength 8192
 #define kdf 5.3833007813
+#define kDoppler 2.5
 
 @interface ModuleBViewController ()
 
@@ -31,9 +32,11 @@
 @property (strong, nonatomic) NSTimer *timer;
 
 @property (nonatomic) float frequency;
-@property (weak, nonatomic) IBOutlet UILabel *frequencyLabel;
-
 @property (nonatomic) BOOL shouldSetOriginal;
+@property (nonatomic) int noMoveCount;
+
+@property (weak, nonatomic) IBOutlet UILabel *frequencyLabel;
+@property (weak, nonatomic) IBOutlet UILabel *dopplerMovementLabel;
 
 @end
 
@@ -42,10 +45,10 @@
 RingBuffer *ringBufferB;
 
 typedef enum dopplerStates {
-    NONE,
-    FORWARD,
-    BACK,
-    BOTH
+    DOPPLER_NONE,
+    DOPPLER_FORWARD,
+    DOPPLER_BACKWARD,
+    DOPPLER_BOTH
 } DopplerState;
 
 // Lazily instantiate all the variables
@@ -114,17 +117,17 @@ typedef enum dopplerStates {
 
 - (float) frequency {
     if(!_frequency){
-        _frequency = 15000;
+        _frequency = 17500;
     }
     return _frequency;
 }
 
-- (BOOL) shouldSetOriginal {
-    if(!_shouldSetOriginal){
-        _shouldSetOriginal = YES;
-    }
-    return _shouldSetOriginal;
-}
+//- (BOOL) shouldSetOriginal {
+//    if(!_shouldSetOriginal){
+//        _shouldSetOriginal = YES;
+//    }
+//    return _shouldSetOriginal;
+//}
 
 - (void)createTimer {
     self.timer = [NSTimer scheduledTimerWithTimeInterval:.1
@@ -156,7 +159,7 @@ typedef enum dopplerStates {
          for (int i=0; i < numFrames; ++i)
          {
              for(int j=0;j<numChannels;j++){
-                 data[i*numChannels+j] = 5.0*sin(phase);
+                 data[i*numChannels+j] = 1.0*sin(phase);
                  
              }
              phase += phaseIncrement;
@@ -176,6 +179,8 @@ typedef enum dopplerStates {
     ringBufferB = new RingBuffer(kBufferLength,2);
     
     self.graphHelper->SetBounds(-0.9,0.7,-0.9,0.9); // bottom, top, left, right, full screen==(-1,1,-1,1)
+    
+    self.shouldSetOriginal = YES;
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -239,25 +244,44 @@ typedef enum dopplerStates {
     float maxLeft = 0;
     int frequencyIndex = self.frequency/kdf;
     
-    for (int i = frequencyIndex - 10; i < frequencyIndex; i++) {
-        float magnitudeDifference = self.fftMagnitudeBuffer[i] - self.fftOriginal[i];
+    //float magnitudeOffset = self.fftMagnitudeBuffer[frequencyIndex] - self.fftOriginal[frequencyIndex];
+    //float magnitudeOffset = 0.0;
+    
+    for (int i = frequencyIndex - 23; i < frequencyIndex - 3; i++) {
+        float magnitudeDifference = self.fftDecibel[i] - self.fftOriginal[i];
         if (magnitudeDifference > maxLeft) {
             maxLeft = magnitudeDifference;
         }
     }
     
-    for (int i = frequencyIndex + 1; i < frequencyIndex + 11; i++) {
-        float magnitudeDifference = self.fftMagnitudeBuffer[i] - self.fftOriginal[i];
+    for (int i = frequencyIndex + 4; i < frequencyIndex + 24; i++) {
+        float magnitudeDifference = self.fftDecibel[i] - self.fftOriginal[i];
         if (magnitudeDifference > maxRight) {
             maxRight = magnitudeDifference;
         }
     }
+
+//    if (maxRight > 2.5) {
+//        NSLog(@"Max Right: %f", maxRight);
+//    }
+//    
+//    if (maxLeft > 2.5) {
+//        NSLog(@"Max Left: %f", maxLeft);
+//    }
     
-    NSLog(@"Max Right: %f", maxRight);
-    NSLog(@"Max Left: %f", maxLeft);
+//        NSLog(@"Max Right: %f", maxRight);
+//        NSLog(@"Max Left: %f", maxLeft);
     
-    
-    return NONE;
+//    if (maxRight > kDoppler && maxLeft > kDoppler) {
+//        return DOPPLER_BOTH;
+//    } else
+    if (maxRight > kDoppler) {
+        return DOPPLER_FORWARD;
+    } else if (maxLeft > kDoppler) {
+        return DOPPLER_BACKWARD;
+    } else {
+        return DOPPLER_NONE;
+    }
 }
 
 #pragma mark - OpenGL and Update functions
@@ -280,23 +304,45 @@ typedef enum dopplerStates {
         self.fftDecibel[i] = 20.0 * log10f(fabs(self.fftMagnitudeBuffer[i]));
     }
     int tempIndex = self.frequency/kdf;
-    if (self.shouldSetOriginal == YES && self.fftMagnitudeBuffer[tempIndex] > 0) {
-        for (int i = 0; i < kBufferLength/2; i++){
-            self.fftOriginal[i] = self.fftMagnitudeBuffer[i];
+    if (self.shouldSetOriginal && self.fftMagnitudeBuffer[tempIndex] > 10) {
+        for (int i = 0; i < kBufferLength/2; i++) {
+            self.fftOriginal[i] = self.fftDecibel[i];
         }
+        
         self.shouldSetOriginal = NO;
         
         //for (int i = 0; i < kBufferLength/2; i++){
-            NSLog(@"Original at %d: %f", tempIndex, self.fftOriginal[tempIndex]);
-            NSLog(@"Buffer at %d: %f", tempIndex, self.fftMagnitudeBuffer[tempIndex]);
+//            NSLog(@"Original at %d: %f", tempIndex, self.fftOriginal[tempIndex]);
+//            NSLog(@"Buffer at %d: %f", tempIndex, self.fftMagnitudeBuffer[tempIndex]);
         //}
     }
     
-    //[self detectMovement];
+    if (!self.shouldSetOriginal) {
+        DopplerState dopplerState = [self detectMovement];
+        
+        if (dopplerState == DOPPLER_BOTH) {
+            self.dopplerMovementLabel.text = @"Forward and Backward";
+            
+            self.noMoveCount = 0;
+        } else if (dopplerState == DOPPLER_FORWARD) {
+            self.dopplerMovementLabel.text = @"Forward Movement";
+            
+            self.noMoveCount = 0;
+        } else if (dopplerState == DOPPLER_BACKWARD) {
+            self.dopplerMovementLabel.text = @"Backward Movement";
+            
+            self.noMoveCount = 0;
+        } else if (dopplerState == DOPPLER_NONE) {
+            self.noMoveCount++;
+            if (self.noMoveCount > 7) {
+                self.dopplerMovementLabel.text = @"No Movement";
+            }
+        }
+    }
     
     // plot the FFT
-    self.graphHelper->setGraphData(0, self.fftMagnitudeBuffer + 2600, kBufferLength/2 - 3600, sqrt(kBufferLength)); // set graph channel
-    self.graphHelper->setGraphData(1, self.fftDecibel + 2600, kBufferLength/2 - 3600, sqrt(kBufferLength)); // set graph channel
+    self.graphHelper->setGraphData(0, self.fftMagnitudeBuffer + 2600, kBufferLength/2 - 2600, sqrt(kBufferLength)); // set graph channel
+    self.graphHelper->setGraphData(1, self.fftDecibel + 2600, kBufferLength/2 - 2600, sqrt(kBufferLength)); // set graph channel
     
     self.graphHelper->update(); // update the graph
 }

@@ -76,7 +76,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="15000" minValue="15000" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="7dO-m3-uum">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="17500" minValue="15000" maxValue="20000" translatesAutoresizingMaskIntoConstraints="NO" id="7dO-m3-uum">
                                 <rect key="frame" x="65" y="72" width="194" height="31"/>
                                 <connections>
                                     <action selector="frequencySliderChanged:" destination="9z4-GH-CfK" eventType="valueChanged" id="GPf-j8-WEi"/>
@@ -94,8 +94,14 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="15000 Hz" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nmN-2s-cvy">
-                                <rect key="frame" x="108" y="518" width="105" height="30"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Movement" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RKJ-Uw-7aL">
+                                <rect key="frame" x="83" y="518" width="155" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="17500 Hz" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nmN-2s-cvy">
+                                <rect key="frame" x="108" y="480" width="105" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
@@ -106,17 +112,20 @@
                             <constraint firstItem="Lkj-h5-wXo" firstAttribute="leading" secondItem="7dO-m3-uum" secondAttribute="trailing" constant="8" id="3ni-1M-ZiS"/>
                             <constraint firstItem="Lkj-h5-wXo" firstAttribute="top" secondItem="s3O-Ng-eMt" secondAttribute="bottom" constant="15" id="84e-5g-xtS"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Lkj-h5-wXo" secondAttribute="trailing" constant="-9" id="9Gg-vW-rXa"/>
+                            <constraint firstItem="RKJ-Uw-7aL" firstAttribute="top" secondItem="nmN-2s-cvy" secondAttribute="bottom" constant="8" id="ILY-ap-o8X"/>
                             <constraint firstItem="cln-Aq-5zK" firstAttribute="top" secondItem="s3O-Ng-eMt" secondAttribute="bottom" constant="15" id="NVs-ib-L1B"/>
                             <constraint firstAttribute="centerX" secondItem="7dO-m3-uum" secondAttribute="centerX" constant="-2" id="OYj-8R-3y0"/>
+                            <constraint firstItem="t9q-b6-qXs" firstAttribute="top" secondItem="RKJ-Uw-7aL" secondAttribute="bottom" constant="20" id="Omr-Zy-jBJ"/>
+                            <constraint firstAttribute="centerX" secondItem="RKJ-Uw-7aL" secondAttribute="centerX" constant="-0.5" id="dSE-G0-HUE"/>
                             <constraint firstItem="7dO-m3-uum" firstAttribute="leading" secondItem="cln-Aq-5zK" secondAttribute="trailing" constant="8" id="gJw-CU-DE3"/>
-                            <constraint firstAttribute="centerX" secondItem="nmN-2s-cvy" secondAttribute="centerX" id="hsp-gt-43T"/>
-                            <constraint firstItem="t9q-b6-qXs" firstAttribute="top" secondItem="nmN-2s-cvy" secondAttribute="bottom" constant="20" id="ilI-is-r1h"/>
                             <constraint firstItem="7dO-m3-uum" firstAttribute="top" secondItem="s3O-Ng-eMt" secondAttribute="bottom" constant="8" id="q5u-bE-7Gp"/>
                             <constraint firstItem="cln-Aq-5zK" firstAttribute="leading" secondItem="106-kn-bLB" secondAttribute="leadingMargin" constant="-9" id="tI0-uG-1eL"/>
+                            <constraint firstAttribute="centerX" secondItem="nmN-2s-cvy" secondAttribute="centerX" constant="-0.5" id="zwh-nP-m02"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Module B" id="RwD-B7-mqr"/>
                     <connections>
+                        <outlet property="dopplerMovementLabel" destination="RKJ-Uw-7aL" id="RJU-W7-vjc"/>
                         <outlet property="frequencyLabel" destination="nmN-2s-cvy" id="Dxx-Ep-Xmf"/>
                     </connections>
                 </viewController>
