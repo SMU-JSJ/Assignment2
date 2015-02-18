@@ -13,9 +13,9 @@
 #import "SMUGraphHelper.h"
 #import "SMUFFTHelper.h"
 
-#define kBufferLength 4096
-#define kWindowSize 3
-#define kdf 10.766
+#define kBufferLength 8192
+#define kWindowSize 7
+#define kdf 5.3833007813
 
 @interface ModuleAViewController ()
 
@@ -80,12 +80,17 @@ RingBuffer *ringBuffer;
 }
 
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    
-    ringBuffer = new RingBuffer(kBufferLength,2);
+- (IBAction)togglePausePlayWhenClicked:(UIButton *)sender {
+    if([sender.currentTitle isEqualToString:@"Pause"]) {
+        [self.timer invalidate];
+        [sender setTitle:@"Play" forState:normal];
+    } else {
+        [self createTimer];
+        [sender setTitle:@"Pause" forState:normal];
+    }
+}
+
+- (void)createTimer {
     self.timer = [NSTimer scheduledTimerWithTimeInterval:.1
                                                   target:self
                                                 selector:@selector(update)
@@ -93,12 +98,21 @@ RingBuffer *ringBuffer;
                                                  repeats:YES];
     
     [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+}
+
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
     
-    
+    ringBuffer = new RingBuffer(kBufferLength,2);
 }
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    
+    [self createTimer];
     
     //Start playing if it isn't already.
     if(![self.audioManager playing]){
@@ -116,8 +130,9 @@ RingBuffer *ringBuffer;
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
-    // Pause audioManager
+    // Pause audioManager and stop timer
     [self.audioManager pause];
+    [self.timer invalidate];
 }
 
 -(void) viewDidDisappear:(BOOL)animated {
