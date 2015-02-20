@@ -13,8 +13,9 @@
 #import "SMUGraphHelper.h"
 #import "SMUFFTHelper.h"
 
-#define kBufferLength 8192
-#define kWindowSize 7
+#define kBufferLength 4096
+#define kPaddedBufferLength 8192
+#define kWindowSize 5
 #define kdf 5.3833007813
 
 @interface ModuleAViewController ()
@@ -60,21 +61,21 @@ RingBuffer *ringBuffer;
 
 - (SMUFFTHelper*) fftHelper {
     if(!_fftHelper){
-        _fftHelper = new SMUFFTHelper(kBufferLength,kBufferLength,WindowTypeRect);
+        _fftHelper = new SMUFFTHelper(kPaddedBufferLength,kPaddedBufferLength,WindowTypeRect);
     }
     return _fftHelper;
 }
 
 - (float*) fftMagnitudeBuffer {
     if(!_fftMagnitudeBuffer){
-        _fftMagnitudeBuffer = (float *)calloc(kBufferLength/2,sizeof(float));
+        _fftMagnitudeBuffer = (float *)calloc(kPaddedBufferLength/2,sizeof(float));
     }
     return _fftMagnitudeBuffer;
 }
 
 - (float*) fftPhaseBuffer {
     if(!_fftPhaseBuffer){
-        _fftPhaseBuffer = (float *)calloc(kBufferLength/2,sizeof(float));
+        _fftPhaseBuffer = (float *)calloc(kPaddedBufferLength/2,sizeof(float));
     }
     return _fftPhaseBuffer;
 }
@@ -125,27 +126,7 @@ RingBuffer *ringBuffer;
              ringBuffer->AddNewFloatData(data, numFrames);
      }];
     
-    
-    // TODO: fix this
-    __block float frequency = 0; //starting frequency
-    __block float phase = 0.0;
-    __block float samplingRate = self.audioManager.samplingRate;
-    [self.audioManager setOutputBlock:^(float *data, UInt32 numFrames, UInt32 numChannels)
-     {
-         double phaseIncrement = 2*M_PI*frequency/samplingRate;
-         double repeatMax = 2*M_PI;
-         for (int i=0; i < numFrames; ++i)
-         {
-             for(int j=0;j<numChannels;j++){
-                 data[i*numChannels+j] = 5.0*sin(phase);
-                 
-             }
-             phase += phaseIncrement;
-             
-             if(phase>repeatMax)
-                 phase -= repeatMax;
-         }
-     }];
+    [self.audioManager setOutputBlock:nil];
 
     
 }
@@ -198,10 +179,10 @@ RingBuffer *ringBuffer;
     self.peakOneFreq = 0;
     self.peakTwoFreq = 0;
     
-    for (int i = 0; i < kBufferLength/2 - kWindowSize; i++) {
+    for (int i = 0; i < kPaddedBufferLength/2 - kWindowSize; i++) {
         int index = [self maxIndex:self.fftMagnitudeBuffer startIndex:i length:kWindowSize];
         // check the index is the midpoint
-        if (index == i + (kWindowSize - 1)/2 && self.fftMagnitudeBuffer[index] > 5) {
+        if (index == i + (kWindowSize - 1)/2 && self.fftMagnitudeBuffer[index] > 10) {
             [self compareAndSetPeakValues:index peakOneIndex:self.peakOneIndex peakTwoIndex:self.peakTwoIndex data:self.fftMagnitudeBuffer];
         }
     }

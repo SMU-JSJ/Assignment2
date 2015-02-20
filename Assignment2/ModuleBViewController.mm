@@ -15,7 +15,7 @@
 
 #define kBufferLength 8192
 #define kdf 5.3833007813
-#define kDoppler 2.5
+#define kDoppler 15
 
 @interface ModuleBViewController ()
 
@@ -32,11 +32,14 @@
 @property (strong, nonatomic) NSTimer *timer;
 
 @property (nonatomic) float frequency;
+@property (nonatomic) float volumeScale;
 @property (nonatomic) BOOL shouldSetOriginal;
 @property (nonatomic) int noMoveCount;
+@property (nonatomic) int counter;
 
 @property (weak, nonatomic) IBOutlet UILabel *frequencyLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dopplerMovementLabel;
+@property (weak, nonatomic) IBOutlet UIProgressView *progressBar;
 
 @end
 
@@ -47,8 +50,7 @@ RingBuffer *ringBufferB;
 typedef enum dopplerStates {
     DOPPLER_NONE,
     DOPPLER_FORWARD,
-    DOPPLER_BACKWARD,
-    DOPPLER_BOTH
+    DOPPLER_BACKWARD
 } DopplerState;
 
 // Lazily instantiate all the variables
@@ -70,7 +72,7 @@ typedef enum dopplerStates {
 - (GraphHelper*) graphHelper {
     if(!_graphHelper){
         int framesPerSecond = 30;
-        int numDataArraysToGraph = 2;
+        int numDataArraysToGraph = 1;
         _graphHelper = new GraphHelper(self,
                                        framesPerSecond,
                                        numDataArraysToGraph,
@@ -122,12 +124,10 @@ typedef enum dopplerStates {
     return _frequency;
 }
 
-//- (BOOL) shouldSetOriginal {
-//    if(!_shouldSetOriginal){
-//        _shouldSetOriginal = YES;
-//    }
-//    return _shouldSetOriginal;
-//}
+- (IBAction)recalibrateClicked:(UIBarButtonItem *)sender {
+    self.shouldSetOriginal = YES;
+}
+
 
 - (void)createTimer {
     self.timer = [NSTimer scheduledTimerWithTimeInterval:.1
@@ -178,7 +178,7 @@ typedef enum dopplerStates {
     
     ringBufferB = new RingBuffer(kBufferLength,2);
     
-    self.graphHelper->SetBounds(-0.9,0.7,-0.9,0.9); // bottom, top, left, right, full screen==(-1,1,-1,1)
+    self.graphHelper->SetBounds(-0.9,0.9,-0.9,0.9); // bottom, top, left, right, full screen==(-1,1,-1,1)
     
     self.shouldSetOriginal = YES;
 }
@@ -188,7 +188,7 @@ typedef enum dopplerStates {
     
     //[self createTimer];
     
-    //Start playing if it isn't already.
+         //Start playing if it isn't already.
     if(![self.audioManager playing]){
         [self.audioManager play];
     }
@@ -244,9 +244,6 @@ typedef enum dopplerStates {
     float maxLeft = 0;
     int frequencyIndex = self.frequency/kdf;
     
-    //float magnitudeOffset = self.fftMagnitudeBuffer[frequencyIndex] - self.fftOriginal[frequencyIndex];
-    //float magnitudeOffset = 0.0;
-    
     for (int i = frequencyIndex - 23; i < frequencyIndex - 3; i++) {
         float magnitudeDifference = self.fftDecibel[i] - self.fftOriginal[i];
         if (magnitudeDifference > maxLeft) {
@@ -261,23 +258,9 @@ typedef enum dopplerStates {
         }
     }
 
-//    if (maxRight > 2.5) {
-//        NSLog(@"Max Right: %f", maxRight);
-//    }
-//    
-//    if (maxLeft > 2.5) {
-//        NSLog(@"Max Left: %f", maxLeft);
-//    }
-    
-//        NSLog(@"Max Right: %f", maxRight);
-//        NSLog(@"Max Left: %f", maxLeft);
-    
-//    if (maxRight > kDoppler && maxLeft > kDoppler) {
-//        return DOPPLER_BOTH;
-//    } else
-    if (maxRight > kDoppler) {
+    if (maxRight > kDoppler * self.volumeScale && maxRight > maxLeft) {
         return DOPPLER_FORWARD;
-    } else if (maxLeft > kDoppler) {
+    } else if (maxLeft > kDoppler * self.volumeScale) {
         return DOPPLER_BACKWARD;
     } else {
         return DOPPLER_NONE;
@@ -290,9 +273,12 @@ typedef enum dopplerStates {
     self.graphHelper->draw(); // draw the graph
 }
 
-
 //  override the GLKViewController update function, from OpenGLES
 - (void)update{
+    if (self.counter < 20) {
+        self.counter++;
+        return;
+    }
     
     // plot the audio
     ringBufferB->FetchFreshData2(self.audioData, kBufferLength, 0, 1);
@@ -303,46 +289,50 @@ typedef enum dopplerStates {
     for (int i = 0; i < kBufferLength/2; i++) {
         self.fftDecibel[i] = 20.0 * log10f(fabs(self.fftMagnitudeBuffer[i]));
     }
-    int tempIndex = self.frequency/kdf;
-    if (self.shouldSetOriginal && self.fftMagnitudeBuffer[tempIndex] > 10) {
+    
+//    self.volumeScale = [[AVAudioSession sharedInstance] outputVolume];
+    float tempVol = [[AVAudioSession sharedInstance] outputVolume];
+    if(self.volumeScale != tempVol) {
+        self.volumeScale = tempVol;
+        self.shouldSetOriginal = YES;
+    }
+    
+    if (self.shouldSetOriginal) {
         for (int i = 0; i < kBufferLength/2; i++) {
             self.fftOriginal[i] = self.fftDecibel[i];
         }
         
         self.shouldSetOriginal = NO;
-        
-        //for (int i = 0; i < kBufferLength/2; i++){
-//            NSLog(@"Original at %d: %f", tempIndex, self.fftOriginal[tempIndex]);
-//            NSLog(@"Buffer at %d: %f", tempIndex, self.fftMagnitudeBuffer[tempIndex]);
-        //}
     }
     
     if (!self.shouldSetOriginal) {
         DopplerState dopplerState = [self detectMovement];
         
-        if (dopplerState == DOPPLER_BOTH) {
-            self.dopplerMovementLabel.text = @"Forward and Backward";
-            
-            self.noMoveCount = 0;
-        } else if (dopplerState == DOPPLER_FORWARD) {
+        if (dopplerState == DOPPLER_FORWARD) {
             self.dopplerMovementLabel.text = @"Forward Movement";
-            
             self.noMoveCount = 0;
+            
+            if (self.progressBar.progress < 1)
+                self.progressBar.progress += 0.05;
+            
         } else if (dopplerState == DOPPLER_BACKWARD) {
             self.dopplerMovementLabel.text = @"Backward Movement";
-            
             self.noMoveCount = 0;
+            
+            if (self.progressBar.progress > 0)
+                self.progressBar.progress -= 0.05;
+            
         } else if (dopplerState == DOPPLER_NONE) {
             self.noMoveCount++;
-            if (self.noMoveCount > 7) {
+            if (self.noMoveCount > 5) {
                 self.dopplerMovementLabel.text = @"No Movement";
             }
         }
     }
     
     // plot the FFT
-    self.graphHelper->setGraphData(0, self.fftMagnitudeBuffer + 2600, kBufferLength/2 - 2600, sqrt(kBufferLength)); // set graph channel
-    self.graphHelper->setGraphData(1, self.fftDecibel + 2600, kBufferLength/2 - 2600, sqrt(kBufferLength)); // set graph channel
+    //self.graphHelper->setGraphData(0, self.fftMagnitudeBuffer + 2600, kBufferLength/2 - 2600, sqrt(kBufferLength)); // set graph channel
+    self.graphHelper->setGraphData(0, self.fftDecibel + 2600, kBufferLength/2 - 2600, sqrt(kBufferLength)); // set graph channel
     
     self.graphHelper->update(); // update the graph
 }

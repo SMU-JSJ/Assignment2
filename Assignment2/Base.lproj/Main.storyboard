@@ -5,7 +5,7 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--Table View Controller-->
+        <!--Assignment 2-->
         <scene sceneID="Huk-xG-vTE">
             <objects>
                 <tableViewController id="d3S-Ty-RR6" sceneMemberID="viewController">
@@ -58,7 +58,7 @@
                             <outlet property="delegate" destination="d3S-Ty-RR6" id="BhR-Ls-Am3"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="Pan-22-gHR"/>
+                    <navigationItem key="navigationItem" title="Assignment 2" id="Pan-22-gHR"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MUr-1Q-WxM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -106,6 +106,9 @@
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="4Oz-aY-0cK">
+                                <rect key="frame" x="16" y="120" width="288" height="2"/>
+                            </progressView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -116,17 +119,28 @@
                             <constraint firstItem="cln-Aq-5zK" firstAttribute="top" secondItem="s3O-Ng-eMt" secondAttribute="bottom" constant="15" id="NVs-ib-L1B"/>
                             <constraint firstAttribute="centerX" secondItem="7dO-m3-uum" secondAttribute="centerX" constant="-2" id="OYj-8R-3y0"/>
                             <constraint firstItem="t9q-b6-qXs" firstAttribute="top" secondItem="RKJ-Uw-7aL" secondAttribute="bottom" constant="20" id="Omr-Zy-jBJ"/>
+                            <constraint firstItem="4Oz-aY-0cK" firstAttribute="leading" secondItem="106-kn-bLB" secondAttribute="leadingMargin" id="d9E-Up-bXg"/>
                             <constraint firstAttribute="centerX" secondItem="RKJ-Uw-7aL" secondAttribute="centerX" constant="-0.5" id="dSE-G0-HUE"/>
                             <constraint firstItem="7dO-m3-uum" firstAttribute="leading" secondItem="cln-Aq-5zK" secondAttribute="trailing" constant="8" id="gJw-CU-DE3"/>
+                            <constraint firstItem="4Oz-aY-0cK" firstAttribute="top" secondItem="7dO-m3-uum" secondAttribute="bottom" constant="18" id="liM-Sg-Ycp"/>
                             <constraint firstItem="7dO-m3-uum" firstAttribute="top" secondItem="s3O-Ng-eMt" secondAttribute="bottom" constant="8" id="q5u-bE-7Gp"/>
+                            <constraint firstItem="7dO-m3-uum" firstAttribute="top" secondItem="s3O-Ng-eMt" secondAttribute="bottom" constant="8" id="rcR-AR-v1r"/>
                             <constraint firstItem="cln-Aq-5zK" firstAttribute="leading" secondItem="106-kn-bLB" secondAttribute="leadingMargin" constant="-9" id="tI0-uG-1eL"/>
+                            <constraint firstItem="4Oz-aY-0cK" firstAttribute="trailing" secondItem="106-kn-bLB" secondAttribute="trailingMargin" id="uD9-sO-1hr"/>
                             <constraint firstAttribute="centerX" secondItem="nmN-2s-cvy" secondAttribute="centerX" constant="-0.5" id="zwh-nP-m02"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Module B" id="RwD-B7-mqr"/>
+                    <navigationItem key="navigationItem" title="Module B" id="RwD-B7-mqr">
+                        <barButtonItem key="rightBarButtonItem" title="Recalibrate" id="SUP-iH-8pL">
+                            <connections>
+                                <action selector="recalibrateClicked:" destination="9z4-GH-CfK" id="Zie-yM-2ek"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="dopplerMovementLabel" destination="RKJ-Uw-7aL" id="RJU-W7-vjc"/>
                         <outlet property="frequencyLabel" destination="nmN-2s-cvy" id="Dxx-Ep-Xmf"/>
+                        <outlet property="progressBar" destination="4Oz-aY-0cK" id="gyI-Dv-4ZJ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="VB5-ju-HFm" userLabel="First Responder" sceneMemberID="firstResponder"/>
