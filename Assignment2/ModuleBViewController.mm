@@ -239,6 +239,17 @@ typedef enum dopplerStates {
     
 }
 
+- (void)showPopup:(float)progressBarValue {
+    if (progressBarValue == 1) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Congratulations!"
+                                                        message:@"You won!"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
+}
+
 - (DopplerState)detectMovement {
     float maxRight = 0;
     float maxLeft = 0;
@@ -312,8 +323,10 @@ typedef enum dopplerStates {
             self.dopplerMovementLabel.text = @"Forward Movement";
             self.noMoveCount = 0;
             
-            if (self.progressBar.progress < 1)
+            if (self.progressBar.progress < 1) {
                 self.progressBar.progress += 0.05;
+                [self showPopup:self.progressBar.progress];
+            }
             
         } else if (dopplerState == DOPPLER_BACKWARD) {
             self.dopplerMovementLabel.text = @"Backward Movement";

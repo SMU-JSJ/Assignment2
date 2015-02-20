@@ -160,8 +160,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="-- Hz" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="avc-nn-J2Q">
-                                <rect key="frame" x="118" y="232" width="80" height="45"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="36"/>
+                                <rect key="frame" x="125" y="199" width="71" height="39"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -176,27 +176,44 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-- Hz" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="itC-To-cia">
-                                <rect key="frame" x="118" y="296" width="80" height="43"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="36"/>
+                                <rect key="frame" x="125" y="289" width="71" height="39"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="--" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E0V-Wj-bTN">
+                                <rect key="frame" x="148" y="326" width="25" height="39"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="--" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YLU-C0-5ue">
+                                <rect key="frame" x="148" y="236" width="25" height="39"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="centerY" secondItem="itC-To-cia" secondAttribute="centerY" constant="-33.5" id="6Eo-eB-w7W"/>
-                            <constraint firstItem="itC-To-cia" firstAttribute="top" secondItem="avc-nn-J2Q" secondAttribute="bottom" constant="19" id="AId-73-nlP"/>
-                            <constraint firstAttribute="centerX" secondItem="avc-nn-J2Q" secondAttribute="centerX" constant="2" id="DpE-8v-eyd"/>
-                            <constraint firstAttribute="centerX" secondItem="itC-To-cia" secondAttribute="centerX" constant="2" id="LbZ-Fe-WfC"/>
+                            <constraint firstAttribute="centerX" secondItem="avc-nn-J2Q" secondAttribute="centerX" id="B9p-G6-dhl"/>
+                            <constraint firstItem="YLU-C0-5ue" firstAttribute="top" secondItem="avc-nn-J2Q" secondAttribute="bottom" constant="-2" id="GcW-gJ-XEE"/>
+                            <constraint firstItem="E0V-Wj-bTN" firstAttribute="top" secondItem="itC-To-cia" secondAttribute="bottom" constant="-2" id="OgJ-ad-Jxb"/>
+                            <constraint firstAttribute="centerY" secondItem="avc-nn-J2Q" secondAttribute="centerY" constant="65.5" id="QxP-8k-TRG"/>
                             <constraint firstAttribute="centerX" secondItem="x3D-B0-TeP" secondAttribute="centerX" id="Teb-HE-U4s"/>
-                            <constraint firstAttribute="centerY" secondItem="avc-nn-J2Q" secondAttribute="centerY" constant="30" id="eFJ-fS-3YC"/>
+                            <constraint firstAttribute="centerX" secondItem="YLU-C0-5ue" secondAttribute="centerX" id="XD3-fo-sRq"/>
+                            <constraint firstAttribute="centerX" secondItem="itC-To-cia" secondAttribute="centerX" id="ZmX-IG-OmB"/>
                             <constraint firstItem="M1g-ZL-CBQ" firstAttribute="top" secondItem="x3D-B0-TeP" secondAttribute="bottom" constant="20" id="haK-vu-Rmy"/>
+                            <constraint firstItem="itC-To-cia" firstAttribute="top" secondItem="YLU-C0-5ue" secondAttribute="bottom" constant="14" id="oCe-rd-a5w"/>
+                            <constraint firstAttribute="centerX" secondItem="E0V-Wj-bTN" secondAttribute="centerX" id="ucz-52-wI2"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Module A" id="6X8-BI-5ut"/>
                     <connections>
                         <outlet property="peakOneLabel" destination="avc-nn-J2Q" id="Ykd-ES-QrB"/>
+                        <outlet property="peakOneNoteLabel" destination="YLU-C0-5ue" id="ag5-sE-cGq"/>
                         <outlet property="peakTwoLabel" destination="itC-To-cia" id="lPQ-zg-g4z"/>
+                        <outlet property="peakTwoNoteLabel" destination="E0V-Wj-bTN" id="N07-03-1Xy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rh8-sb-LJm" userLabel="First Responder" sceneMemberID="firstResponder"/>

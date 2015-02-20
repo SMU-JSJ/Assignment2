@@ -15,7 +15,7 @@
 
 #define kBufferLength 8192
 #define kPaddedBufferLength 16384
-#define kWindowSize 7
+#define kWindowSize 9
 #define kdf 2.6916503906
 
 @interface ModuleAViewController ()
@@ -38,6 +38,8 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *peakOneLabel;
 @property (weak, nonatomic) IBOutlet UILabel *peakTwoLabel;
+@property (weak, nonatomic) IBOutlet UILabel *peakOneNoteLabel;
+@property (weak, nonatomic) IBOutlet UILabel *peakTwoNoteLabel;
 
 @end
 
@@ -228,19 +230,21 @@ RingBuffer *ringBuffer;
     [self chooseAndSetPeakIndex:oldPeakTwoIndex oldFreq:oldPeakTwoFreq newIndex:self.peakTwoIndex newFreq:self.peakTwoFreq peak:2];
     
     [self orderPeaks];
-    
-    NSLog(@"Peak 1: %f, Peak 2: %f", self.fftMagnitudeBuffer[self.peakOneIndex], self.fftMagnitudeBuffer[self.peakTwoIndex]);
-    
+        
     if (self.peakOneFreq == 0) {
         self.peakOneLabel.text = [NSString stringWithFormat:@"-- Hz"];
+        self.peakOneNoteLabel.text = [NSString stringWithFormat:@"--"];
     } else {
-        self.peakOneLabel.text = [NSString stringWithFormat:@"%.0f Hz, %@", self.peakOneFreq, [self getNoteFromFrequency:self.peakOneFreq]];
+        self.peakOneLabel.text = [NSString stringWithFormat:@"%.0f Hz", self.peakOneFreq];
+        self.peakOneNoteLabel.text = [NSString stringWithFormat:@"%@", [self getNoteFromFrequency:self.peakOneFreq]];
     }
     
     if (self.peakTwoFreq == 0) {
         self.peakTwoLabel.text = [NSString stringWithFormat:@"-- Hz"];
+        self.peakTwoNoteLabel.text = [NSString stringWithFormat:@"--"];
     } else {
-        self.peakTwoLabel.text = [NSString stringWithFormat:@"%.0f Hz, %@", self.peakTwoFreq, [self getNoteFromFrequency:self.peakTwoFreq]];
+        self.peakTwoLabel.text = [NSString stringWithFormat:@"%.0f Hz", self.peakTwoFreq];
+        self.peakTwoNoteLabel.text = [NSString stringWithFormat:@"%@", [self getNoteFromFrequency:self.peakTwoFreq]];
     }
 
 }
