@@ -1,5 +1,5 @@
-//
-//  ViewController.m
+//  Team JSJ - Jordan Kayse, Story Zanetti, Jessica Yeh
+//  ModuleAViewController.m
 //  Assignment2
 //
 //  Created by ch484-mac7 on 2/12/15.
@@ -49,6 +49,7 @@ RingBuffer *ringBuffer;
 
 // Lazily instantiate all the variables
 
+// Array of notes to be able to convert from frequency to notes
 - (NSArray*)notes {
     if (!_notes) {
         _notes = @[@"C0", @"C#0/Db0", @"D0", @"D#0/Eb0", @"E0", @"F0", @"F#0/Gb0",
@@ -71,44 +72,45 @@ RingBuffer *ringBuffer;
     return _notes;
 }
 
-- (Novocaine*) audioManager {
-    if(!_audioManager){
+- (Novocaine*)audioManager {
+    if (!_audioManager) {
         _audioManager = [Novocaine audioManager];
     }
     return _audioManager;
 }
 
-- (float*) audioData {
-    if(!_audioData){
-        _audioData = (float*)calloc(kBufferLength,sizeof(float));
+- (float*)audioData {
+    if (!_audioData) {
+        _audioData = (float*)calloc(kBufferLength, sizeof(float));
     }
     return _audioData;
 }
 
-- (SMUFFTHelper*) fftHelper {
-    if(!_fftHelper){
-        _fftHelper = new SMUFFTHelper(kPaddedBufferLength,kPaddedBufferLength,WindowTypeRect);
+- (SMUFFTHelper*)fftHelper {
+    if (!_fftHelper) {
+        _fftHelper = new SMUFFTHelper(kPaddedBufferLength, kPaddedBufferLength, WindowTypeRect);
     }
     return _fftHelper;
 }
 
-- (float*) fftMagnitudeBuffer {
-    if(!_fftMagnitudeBuffer){
-        _fftMagnitudeBuffer = (float *)calloc(kPaddedBufferLength/2,sizeof(float));
+- (float*)fftMagnitudeBuffer {
+    if (!_fftMagnitudeBuffer) {
+        _fftMagnitudeBuffer = (float*)calloc(kPaddedBufferLength/2, sizeof(float));
     }
     return _fftMagnitudeBuffer;
 }
 
-- (float*) fftPhaseBuffer {
-    if(!_fftPhaseBuffer){
-        _fftPhaseBuffer = (float *)calloc(kPaddedBufferLength/2,sizeof(float));
+- (float*)fftPhaseBuffer {
+    if (!_fftPhaseBuffer) {
+        _fftPhaseBuffer = (float*)calloc(kPaddedBufferLength/2, sizeof(float));
     }
     return _fftPhaseBuffer;
 }
 
-
-- (IBAction)togglePausePlayWhenClicked:(UIButton *)sender {
-    if([sender.currentTitle isEqualToString:@"Pause"]) {
+// When the Pause button is clicked, the updating is stopped
+// When the Play button is clicked, the updating is restarted
+- (IBAction)togglePausePlayWhenClicked:(UIButton*)sender {
+    if ([sender.currentTitle isEqualToString:@"Pause"]) {
         [self.timer invalidate];
         [sender setTitle:@"Play" forState:normal];
     } else {
@@ -117,6 +119,7 @@ RingBuffer *ringBuffer;
     }
 }
 
+// Creates a timer to update the frequency values
 - (void)createTimer {
     self.timer = [NSTimer scheduledTimerWithTimeInterval:.1
                                                   target:self
@@ -131,27 +134,30 @@ RingBuffer *ringBuffer;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
     
+    // Do any additional setup after loading the view, typically from a nib.
     ringBuffer = new RingBuffer(kBufferLength,2);
 }
 
--(void)viewWillAppear:(BOOL)animated{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     [self createTimer];
     
     //Start playing if it isn't already.
-    if(![self.audioManager playing]){
+    if (![self.audioManager playing]) {
         [self.audioManager play];
     }
     
+    // Get sound samples from the microphone and send it to the audio manager
     [self.audioManager setInputBlock:^(float *data, UInt32 numFrames, UInt32 numChannels)
      {
-         if(ringBuffer!=nil)
+         if (ringBuffer != nil) {
              ringBuffer->AddNewFloatData(data, numFrames);
+         }
      }];
     
+    // Set the output block to nil so that the sound from Module B isn't playing
     [self.audioManager setOutputBlock:nil];
 
     
@@ -165,12 +171,11 @@ RingBuffer *ringBuffer;
     [self.timer invalidate];
 }
 
--(void) viewDidDisappear:(BOOL)animated {
-}
-
+// Convert the frequency to the note played
 - (NSString*)getNoteFromFrequency:(float)frequency {
     int index = (int)round(log10f(frequency / 16.35) / log10f(pow(2.0, 1.0/12.0)));
     
+    // Make sure the frequency is within the range of notes we have
     if (index < 0 || index > 107) {
         return @"--";
     }
@@ -178,10 +183,9 @@ RingBuffer *ringBuffer;
     return self.notes[index];
 }
 
--(void)dealloc{
-    
+// Dealloc things; ARC handles everything else, just clean up what we used c++ for (calloc, malloc, new)
+- (void)dealloc {
     free(self.audioData);
-    
     free(self.fftMagnitudeBuffer);
     free(self.fftPhaseBuffer);
     
@@ -191,46 +195,50 @@ RingBuffer *ringBuffer;
     ringBuffer = nil;
     self.fftHelper  = nil;
     self.audioManager = nil;
-    
-    // ARC handles everything else, just clean up what we used c++ for (calloc, malloc, new)
-    
 }
 
-- (void)update{
-    // plot the audio
+- (void)update {
+    // Plot the audio
     ringBuffer->FetchFreshData2(self.audioData, kBufferLength, 0, 1);
     
-    //take the FFT
+    // Take the FFT
     self.fftHelper->forward(0,self.audioData, self.fftMagnitudeBuffer, self.fftPhaseBuffer);
     
+    // Saves the old peak one/two values to compare later to see if we actually want to replace them
     int oldPeakOneIndex = self.peakOneIndex;
     int oldPeakTwoIndex = self.peakTwoIndex;
-    
     float oldPeakOneFreq = self.peakOneFreq;
     float oldPeakTwoFreq = self.peakTwoFreq;
     
+    // Resets the peak indices and frequencies to 0
     self.peakOneIndex = 0;
     self.peakTwoIndex = 0;
-    
     self.peakOneFreq = 0;
     self.peakTwoFreq = 0;
     
+    // Loops through the buffer to find peak one and peak two
     for (int i = 0; i < kPaddedBufferLength/2 - kWindowSize; i++) {
         int index = [self maxIndex:self.fftMagnitudeBuffer startIndex:i length:kWindowSize];
-        // check the index is the midpoint
+        // Check the index is the midpoint
         if (index == i + (kWindowSize - 1)/2 && self.fftMagnitudeBuffer[index] > 20) {
             [self compareAndSetPeakValues:index peakOneIndex:self.peakOneIndex peakTwoIndex:self.peakTwoIndex data:self.fftMagnitudeBuffer];
         }
     }
     
+    // Uses interpolation to find the frequency for peak one/two
     self.peakOneFreq = [self getFrequency:self.peakOneIndex data:self.fftMagnitudeBuffer];
     self.peakTwoFreq = [self getFrequency:self.peakTwoIndex data:self.fftMagnitudeBuffer];
     
+    // Compares the new peak values to the old peak values and resets
+    // the new peak values to the old peak values if they are within
+    // a 6Hz range of each other
     [self chooseAndSetPeakIndex:oldPeakOneIndex oldFreq:oldPeakOneFreq newIndex:self.peakOneIndex newFreq:self.peakOneFreq peak:1];
     [self chooseAndSetPeakIndex:oldPeakTwoIndex oldFreq:oldPeakTwoFreq newIndex:self.peakTwoIndex newFreq:self.peakTwoFreq peak:2];
     
+    // Makes peak one have the higher frequency and peak two the lower frequency
     [self orderPeaks];
-        
+    
+    // Sets peak one labels for frequency and note
     if (self.peakOneFreq == 0) {
         self.peakOneLabel.text = [NSString stringWithFormat:@"-- Hz"];
         self.peakOneNoteLabel.text = [NSString stringWithFormat:@"--"];
@@ -239,6 +247,7 @@ RingBuffer *ringBuffer;
         self.peakOneNoteLabel.text = [NSString stringWithFormat:@"%@", [self getNoteFromFrequency:self.peakOneFreq]];
     }
     
+    // Sets peak two labels for frequency and note
     if (self.peakTwoFreq == 0) {
         self.peakTwoLabel.text = [NSString stringWithFormat:@"-- Hz"];
         self.peakTwoNoteLabel.text = [NSString stringWithFormat:@"--"];
@@ -255,19 +264,22 @@ RingBuffer *ringBuffer;
       length:(int)length {
     float max = -1;
     int maxIndex = -1;
+    
     for (int i = startIndex; i < startIndex + length; i++) {
         if (data[i] > max) {
             max = data[i];
             maxIndex = i;
         }
     }
+    
     return maxIndex;
 }
 
+// Replaces the smaller of the two peaks with the new index (which has the potential peak if it's higher)
 - (void)compareAndSetPeakValues:(int)index
          peakOneIndex:(int)peakOneIndex
          peakTwoIndex:(int)peakTwoIndex
-                 data:(float*)data{
+                 data:(float*)data {
     // see which peak value is smaller
     if (data[peakOneIndex] > data[peakTwoIndex] &&
         data[index] > data[peakTwoIndex]) {
@@ -279,8 +291,9 @@ RingBuffer *ringBuffer;
     }
 }
 
+// Makes peak one larger in frequency than peak two
 - (void)orderPeaks {
-    if (self.peakOneIndex < self.peakTwoIndex){
+    if (self.peakOneIndex < self.peakTwoIndex) {
         int tempIndex = self.peakOneIndex;
         self.peakOneIndex = self.peakTwoIndex;
         self.peakTwoIndex = tempIndex;
@@ -291,10 +304,12 @@ RingBuffer *ringBuffer;
     }
 }
 
+// Uses quadratic interpolation to estimate the peak frequency given an index and an array of data
 - (float)getFrequency:(int)index
                  data:(float*)data {
-    if(index == 0)
+    if (index == 0) {
         return 0;
+    }
     
     float f2 = index * kdf;
     float m1 = data[index - 1];
@@ -302,9 +317,10 @@ RingBuffer *ringBuffer;
     float m3 = data[index + 1];
     
     return f2 + ((m3 - m2) / (2.0 * m2 - m1 - m2)) * kdf / 2.0;
-    
 }
 
+// Compares the old frequencies to the new frequencies, and if the new frequencies and within
+// bounds of the old frequencies it sets the peaks the old values
 - (void)chooseAndSetPeakIndex:(int)oldIndex
                       oldFreq:(float)oldFreq
                      newIndex:(int)newIndex
